@@ -1,21 +1,23 @@
 import numpy as np
 import pywt
 from PIL import Image
+import math
 import matplotlib.pyplot as plt
 
 
 
+#Haar matrix is now orthogonal!
 def build_haar_matrix(row_size):
     size = (int)(row_size/ 2)
     haarM1 = np.zeros((size, row_size))
     for i in range(size):
-        haarM1[i][2 * i] = 0.5
-        haarM1[i][2 * i + 1] = 0.5
+        haarM1[i][2 * i] = math.sqrt(2)/2
+        haarM1[i][2 * i + 1] = math.sqrt(2)/2
 
     haarM2 = np.zeros((size, row_size))
     for i in range(size):
-        haarM2[i][2 * i] = -0.5
-        haarM2[i][2 * i + 1] = 0.5
+        haarM2[i][2 * i] = -math.sqrt(2)/2
+        haarM2[i][2 * i + 1] = math.sqrt(2)/2
 
     m = np.concatenate((haarM1, haarM2), axis=0)
     print(m)
