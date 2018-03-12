@@ -110,5 +110,7 @@ def main():
         img.save("mockup2.jpg")
         img = Image.fromarray(np.asarray(np.clip(wav_result, 0, 255), dtype="uint8"), "RGB")
         img.save("mockup2_wav.jpg")
+        img = Image.fromarray(np.asarray(np.clip(np.subtract(result,wav_result), 0, 255), dtype="uint8"), "RGB")
+        img.save("mockup_subtract.jpg")
 
 main()
