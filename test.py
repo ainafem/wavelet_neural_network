@@ -8,6 +8,7 @@ from keras import Model, Sequential
 from keras.datasets import mnist
 from keras.utils import np_utils
 from wavelet_neural_network import WaveletLayer as wl
+from update_batch_size import update_batch_size
 
 from keras import backend as K
 import matplotlib.image as mpimg
@@ -33,7 +34,7 @@ def build_haar_matrix(row_size):
     m = np.concatenate((haarM1, haarM2), axis=0)
     return m
 
-
+batch_size = K.variable(32)
 
 haarMatrix28 = build_haar_matrix(28)
 haarMatrix14 = build_haar_matrix(14)
@@ -54,14 +55,19 @@ y_test = np_utils.to_categorical(y_test, number_of_classes)
 print(y_train)
 
 input = Input(shape=(28, 28, 1))
-conv1 = Conv2D(20, kernel_size=(5,5))(input)
+conv1 = Conv2D(20, kernel_size=(5,5), padding='same')(input)
 batch1 = BatchNormalization()(conv1)
 #pool1 = MaxPooling2D(pool_size=(2, 2))(batch1)
-pool1 = wl.MyLayer(output_dim=(14, 14, 1), haar_matrix=haarMatrix28)(batch1)
-conv2 = Conv2D(50, kernel_size=(5,5))(pool1)
+pool1 = wl.MyLayer(output_dim=(None, 14, 14, 20), batch_size=batch_size, haar_matrix=haarMatrix28)(batch1)
+
+conv2 = Conv2D(50, kernel_size=(5,5), padding="same")(pool1)
+
 #pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
-pool2 = wl.MyLayer(output_dim=(7, 7), haar_matrix=haarMatrix14)(conv2)
+
+pool2 = wl.MyLayer(output_dim=(None, 7, 7, 50), batch_size=batch_size, haar_matrix=haarMatrix14)(conv2)
+
 batch2 = BatchNormalization()(pool2)
+
 conv3 = Conv2D(500, kernel_size=(4,4))(batch2)
 relu = LeakyReLU(alpha=0)(conv3)
 conv4 = Conv2D(10, kernel_size=(1, 1))(relu)
@@ -73,17 +79,11 @@ model = Model(inputs=input, outputs=activ)
 model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
 
-model.fit(x_train, y_train, epochs=5, batch_size=32)
+model.fit(x_train, y_train, epochs=5, batch_size=32, callbacks=[update_batch_size(batch_size, x_train.shape[0])])
 
+K.set_value(batch_size, 128)
 
-# 9. Fit model on training data
-# model.fit(x_train, y_train,
-#           batch_size=32, nb_epoch=10, verbose=1)
-
-# 10. Evaluate model on test data
-#score = model.evaluate(x_test, y, verbose=0)
-
-loss_and_metrics = model.evaluate(x_test, y_test, batch_size=128)
+loss_and_metrics = model.evaluate(x_test, y_test, batch_size=128, callbacks=[update_batch_size(batch_size, x_test.shape[0])])
 
 
 
