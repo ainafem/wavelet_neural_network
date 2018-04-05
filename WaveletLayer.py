@@ -29,7 +29,7 @@ class MyLayer(Layer):
             result.append(K.batch_dot(tmp, haarMatrix2[:, :, :, i], axes=[1, 2]))
 
         result = K.concatenate(result, -1)
-        result = K.reshape(result, (-1, nconv, K.int_shape(image)[1], K.int_shape(image)[2]))
+        result = K.reshape(result, (-1, K.int_shape(image)[1], K.int_shape(image)[2], nconv))
 
         return result
 

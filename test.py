@@ -78,7 +78,7 @@ model = Model(inputs=input, outputs=activ)
 model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
 
-model.fit(x_train, y_train, epochs=5, batch_size=32)
+model.fit(x_train, y_train, epochs=2, batch_size=32)
 
 K.set_value(batch_size, 128)
 
