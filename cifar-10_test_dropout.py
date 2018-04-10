@@ -3,16 +3,11 @@ from keras.datasets import cifar10
 import os
 import math
 import numpy as np
-from keras.layers import Conv2D, MaxPooling2D, Input, BatchNormalization, Activation, Softmax, LeakyReLU
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
-from keras import Model, Sequential
-from keras.datasets import mnist
-from keras.utils import np_utils
+from keras.layers import Conv2D, Input, BatchNormalization, LeakyReLU
+from keras.layers import Dense, Dropout, Flatten
+from keras import Model
 import WaveletLayer as wl
-from update_batch_size import update_batch_size
 
-from keras import backend as K
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 def build_haar_matrix(row_size):
