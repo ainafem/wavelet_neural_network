@@ -39,8 +39,10 @@ model_name = 'keras_cifar10_trained_model.h5'
 # The data, split between train and test sets:
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 print('x_train shape:', x_train.shape)
-print(x_train.shape[0], 'train samples')
+print(x_train.shape, 'train samples')
 print(x_test.shape[0], 'test samples')
+print(y_train.shape)
+print(type(y_train[0]))
 
 # Convert class vectors to binary class matrices.
 y_train = keras.utils.to_categorical(y_train, num_classes)
