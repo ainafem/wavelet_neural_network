@@ -2,6 +2,7 @@ import numpy as np
 import pywt
 from PIL import Image
 import math
+from numpy import linalg as LA
 import matplotlib.pyplot as plt
 
 
@@ -186,6 +187,21 @@ def build_biorthogonal_matrix(row_size):
 
     return zeros
 
+
+#rotación siguiendo el paper
+def rotate(image):
+    result = np.zeros(image.shape, dtype=np.float)
+    nchannels = 3
+    if len(image.shape) == nchannels:
+        for channel in range(nchannels):
+            mean_x = image[:,:,channel].mean(1)
+            mx = np.matmul(mean_x.T, mean_x)
+            vx = np.matmul(image[:,:,channel].T, image[:,:,channel]) / 32
+            cov_xx = vx - mx
+            w, v = LA.eig(cov_xx)
+            result[:,:,channel] = np.matmul(v, image[:,:,channel] - mean_x)
+    return result
+
 def main():
     img = Image.open("lena.jpg")
     img.load()
@@ -205,27 +221,15 @@ def main():
     img = Image.fromarray(np.asarray(np.clip(result, 0, 255), dtype="uint8"))
     img.save("mockup_biorthogonal.jpg")
 
-    #wav_result = library_wavelet(data)
-    #img = Image.fromarray(np.asarray(np.clip(wav_result, 0, 255), dtype="uint8"))
-    #img.save("mockup6_wav.jpg")
-    # if result.any():
-    #     # plt.imshow(result)
-    #     # plt.show()
-    #
-    #     wav_result = library_wavelet(data)
-    #     inv = idwt(result)
-    #     # ==============================================================================
-    #     #         print(np.array_equal(wav_result, result))
-    #     # ==============================================================================
-    #     print
-    #     np.sum(np.asarray(np.clip(wav_result, 0, 255) - np.clip(result, 0, 255)), dtype="uint8") == 0
-    #     img = Image.fromarray(np.asarray(np.clip(result, 0, 255), dtype="uint8"))
-    #     img.save("mockup4.jpg")
-    #     img = Image.fromarray(np.asarray(np.clip(wav_result, 0, 255), dtype="uint8"))
-    #     img.save("mockup3_wav.jpg")
-    #     img = Image.fromarray(np.asarray(np.clip(np.subtract(result, wav_result), 0, 255), dtype="uint8"))
-    #     img.save("mockup3_subtract.jpg")
-    #     img = Image.fromarray(np.asarray(np.clip(inv, 0, 255), dtype="uint8"))
-    #     img.save("mockup_inv.jpg")
 
-main()
+#test
+def testRotate():
+    img = Image.open("lena.jpg")
+    img.load()
+    data = np.asarray(img, dtype="int32")
+    result = rotate(data)
+    img = Image.fromarray(np.asarray(np.clip(result, 0, 255), dtype="uint8"))
+    img.save("lena_rotated.jpg")
+
+
+testRotate()
